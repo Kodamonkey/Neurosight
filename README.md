@@ -1,7 +1,5 @@
 # NeuroSight – README
 
-> **TL;DR**
->
 > 1. Instala Unity 6.1 LTS con Android Build Support.
 > 2. Clona este repo y ejecuta `git lfs install && git lfs pull`.
 > 3. Abre el proyecto con Unity Hub y pulsa **Build & Run** (Android).
