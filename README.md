@@ -1,5 +1,7 @@
 # NeuroSight – README
 
+> **TL;DR**
+>
 > 1. Instala Unity 6.1 LTS con Android Build Support.
 > 2. Clona este repo y ejecuta `git lfs install && git lfs pull`.
 > 3. Abre el proyecto con Unity Hub y pulsa **Build & Run** (Android).
@@ -47,9 +49,38 @@
 ## 4 · Instalación paso a paso
 
 1. **Clona** el repositorio
+
    ```bash
    git clone https://github.com/NeuroSight/neurosight.git
    cd neurosight
    git lfs install       # sólo la primera vez
    git lfs pull          # descarga los assets grandes
    ```
+
+2. **Abre** el proyecto en **Unity Hub**  
+   _Add project → neurosight → abrir con Unity 6.1 LTS_.
+
+3. **Resuelve dependencias**  
+   El editor descargará automáticamente los paquetes del _Package Manager_.  
+   Si aparece un diálogo “Project upgrade?”, acepta la actualización.
+
+---
+
+## 5 · Flujo de trabajo Git
+
+### 5.1 Ramas
+
+```
+main   ←  estable, solo demos/versiones
+│
+└─ dev ←  integración diaria
+     ├─ feature/HU-3-alinear-fantoma
+     ├─ feature/HU-5-ui-menus
+     └─ hotfix/v0.3.1-gradle
+```
+
+- **main**: desplegable en todo momento. Protegida - no _push_ directo.
+- **dev**: rama de integración; builds nocturnos de CI.
+- **feature/\***: rama por Historia de Usuario o tarea (< 3-4 días).
+- **hotfix/\***: correcciones urgentes desde _main_ (se cherry-pickean a _dev_).
+- Para pasar a main solo sera a traves de PR.
