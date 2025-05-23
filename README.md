@@ -1,37 +1,57 @@
-# Neurosight
+# NeuroSight – README
 
-# Tech Stack
+> **TL;DR**
+>
+> 1. Instala Unity 6.1 LTS con Android Build Support.
+> 2. Clona este repo y ejecuta `git lfs install && git lfs pull`.
+> 3. Abre el proyecto con Unity Hub y pulsa **Build & Run** (Android).
+> 4. Trabaja siempre en _feature-branches_, haz _pull requests_ contra **dev** y deja **main** solo para versiones demo.
 
-### Herramientas principales
-- **Unity 6.1 + Android Build Support**  
-  Motor 3D y compilación multiplataforma.
-- **Unity AR Mobile**  
-  - **AR Foundation 5.1**  
-  Capa unificada sobre ARKit (iOS) y ARCore (Android); escalable a HoloLens 2 y Magic Leap 2.
-  - **AR Core XR Plug-in 5.1**  
-  Soporte nativo de AR para dispositivos Android.
-  - **AR Kit XR Plug-in 5.1**  
-  Soporte nativo de AR para dispositivos iOS.
-  - **AR Subsystems 5.1**  
-  Conjunto de interfaces comunes que habilitan sensores (tracking, depth, planes).
-  - **Input System 1.7**  
-  Gestión moderna de gestos táctiles, controladores y hand-tracking.
-  - **AR Sample Assets / Templates**  
-  Prefabs y escenas de ejemplo incluidas en Unity AR Mobile para acelerar pruebas.
-  - **XR Interaction Toolkit / MRTK 3**  
-  Gestos, raycasts y UI holográfica.
-- **GitHub**  
-  Control de versiones del proyecto.
+---
 
-### ¿Por qué este stack?
-1. **Velocidad de prototipado**  
-   Unity + C# → curva de aprendizaje moderada, abundantes tutoriales y comunidad médica.
-2. **Multiplataforma real**  
-   Un mismo proyecto corre en iOS, Android y visores Mixed Reality sin reescrituras.
-3. **Precisión suficiente para entrenamiento**  
-   Error típico 2–3 mm en HoloLens 2 / Magic Leap 2; válido para practicar localización tumoral.
-4. **Ecosistema médico existente**  
-   fo-dicom, shaders de volumen, ejemplos clínicos ya disponibles.
-5. **Coste accesible**  
-   Unity Personal es gratuita.
+## 1 · Tech Stack
 
+| Capa                     | Versión                                                                             | Rol                                                        |
+| ------------------------ | ----------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| **Motor 3-D/AR**         | Unity 6.1 LTS + Android Build Support                                               | Renderizado, compila a Android/iOS/HoloLens 2/Magic Leap 2 |
+| **AR Móvil**             | AR Foundation 5.1 + AR Core XR Plug-in 5.1 (Android)<br>AR Kit XR Plug-in 5.1 (iOS) | Acceso unificado a sensores (tracking, depth, planos)      |
+| **Interacción**          | XR Interaction Toolkit 2.5 + MRTK 3                                                 | Gestos, hand-tracking, UI holográfica                      |
+| **Entrada**              | Input System 1.7                                                                    | Táctil, mandos, manos                                      |
+| **Medicina**             | fo-DICOM (.NET)                                                                     | Lectura de estudios DICOM                                  |
+| **Control de versiones** | Git + Git LFS (GitHub)                                                              | Código y assets grandes (FBX, PNG, meshes)                 |
+| **CI/CD**                | GitHub Actions (Android workflow)                                                   | Compila APK y sube artefacto                               |
+
+---
+
+## 2 · ¿Por qué este stack?
+
+- **Prototipado rápido** – Unity + C# tienen curva de aprendizaje moderada y gigante comunidad médica.
+- **Multiplataforma real** – Misma base corre en Android, iOS y visores MR.
+- **Precisión clínicamente útil** – Error 2 – 3 mm en HoloLens 2 / Magic Leap 2, suficiente para entrenamiento.
+- **Ecosistema existente** – Plugins DICOM, sombreadores volumétricos, ejemplos quirúrgicos.
+- **Coste accesible** – Unity Personal/Education = gratis; nada de licencias Enterprise.
+
+---
+
+## 3 · Requisitos previos
+
+| Software                                       | Min. versión           | Notas                                                                          |
+| ---------------------------------------------- | ---------------------- | ------------------------------------------------------------------------------ |
+| **Unity Hub**                                  | 3.x                    | Inicia sesión con cuenta _edu_                                                 |
+| **Unity Editor**                               | **6.1 LTS**            | Instalar módulos “Android Build Support” (Android SDK 34, NDK r26, OpenJDK 17) |
+| **Visual Studio 2022** _o_ **JetBrains Rider** | —                      | Workloads: “Game development with Unity”, “Mobile (.NET)”                      |
+| **Git**                                        | 2.44+                  | `git lfs install` una vez                                                      |
+| **Node.js** (opcional)                         | 20+                    | Requerido por algunas tools MRTK 3                                             |
+| **Dispositivo Android**                        | Android 10+ con ARCore | Instala **Google Play Services for AR** y activa _USB debugging_               |
+
+---
+
+## 4 · Instalación paso a paso
+
+1. **Clona** el repositorio
+   ```bash
+   git clone https://github.com/NeuroSight/neurosight.git
+   cd neurosight
+   git lfs install       # sólo la primera vez
+   git lfs pull          # descarga los assets grandes
+   ```
