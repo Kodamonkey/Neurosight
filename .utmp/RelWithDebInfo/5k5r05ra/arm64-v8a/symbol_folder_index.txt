@@ -1,0 +1,1 @@
+C:\Users\Juako\Documents\FeriaSoftware\Neurosight\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\build\intermediates\cxx\RelWithDebInfo\5k5r05ra\obj\arm64-v8a
