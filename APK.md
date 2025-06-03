@@ -41,29 +41,29 @@ Pasos necesarios para configurar el proyecto y generar el APK que se instalará 
 
 ## Configuración de Builds Profiles / Build Settings
 
-1. Pulsa Ctrl + Shift + B para abrir la ventana Build Profiles.
-2. Si aún no existe, haz clic en Add Build Profile. Ponle un nombre descriptivo como Android-AR.
-3. En la sección Platforms, marca Android y desmarca cualquier otra plataforma.
-4. Abajo, verifica que aparezca tu dispositivo en Run Device (p. ej. “Xiaomi Pad 5”). Si tu dispositivo no aparece, pulsa Refresh.
-5. Marca Override Global Scene List y añade solo la escena AR (por defecto suele ser SampleScene). Reemplázala o añádela así:
-      - Abre la carpeta Assets/Scenes/, selecciona tu archivo de escena AR (p. ej. AR_Scene.unity) y haz clic en Add Open Scene.
+1. Pulsa **Ctrl + Shift + B** para abrir la ventana **Build Profiles**.
+2. Si aún no existe, haz clic en **Add Build Profile**. Ponle un nombre descriptivo como Android-AR.
+3. En la sección **Platforms**, marca **Android** y desmarca cualquier otra plataforma.
+4. Abajo, verifica que aparezca tu dispositivo en **Run Device** (p. ej. “Xiaomi Pad 5”). Si tu dispositivo no aparece, pulsa Refresh.
+5. Marca **Override Global Scene List** y añade solo la **escena AR** (por defecto suele ser SampleScene). Reemplázala o añádela así:
+      - Abre la carpeta **Assets/Scenes/**, selecciona tu **archivo** de escena AR (p. ej. AR_Scene.unity) y haz clic en **Add Open Scene**.
       - Elimina la SampleScene de la lista si no la vas a usar y asegurate de marcar la escena que quieras construir.
-7. Haz clic en Player Settings (arriba a la derecha en Build Profiles) y verifica lo siguiente en Android → Other Settings:
-      - Scripting Backend = IL2CPP
-      - Target Architectures = ARM64
-      - Minimum API Level ≥ 26
-8. En el mismo Player Settings, selecciona XR Plug-in Management, pestaña Android y marca Google ARCore. Dentro de ARCore, puedes dejar Requirement = Required y Depth = Optional.
+7. Haz clic en **Player Settings** (arriba a la derecha en Build Profiles) y verifica lo siguiente en **Android → Other Settings**:
+      - **Scripting Backend** = IL2CPP
+      - **Target Architectures** = ARM64
+      - **Minimum API Level** ≥ 26
+8. En el mismo **Player Settings**, selecciona **XR Plug-in Management**, pestaña **Android** y marca **Google ARCore**. Dentro de ARCore, puedes dejar Requirement = Required y Depth = Optional.
 
 ## Generar el APK en dispositivo android
 
-1. Conecta tu tablet/celular Android en modo depuración USB al PC.
-2. Asegúrate de que has aceptado la clave ADB en el dispositivo.
-3. En Unity, abre la ventana Build Profiles (Ctrl + Shift + B) y confirma que tu perfil Android esté activo y tu dispositivo aparezca en Run Device.
-4. Haz clic en Build And Run.
+1. Conecta tu tablet/celular Android en **modo depuración** USB al PC.
+2. Asegúrate de que has **aceptado la clave ADB** en el dispositivo.
+3. En Unity, abre la ventana **Build Profiles** (Ctrl + Shift + B) y confirma que tu **perfil Android esté activo** y tu dispositivo aparezca en **Run Device**.
+4. Haz clic en **Build And Run**.
       - Unity mostrará un diálogo para elegir carpeta y nombre del APK (p. ej. ARPlane.apk).
-      - Selecciona o crea la carpeta Builds/Android/ dentro del proyecto y pulsa Guardar.
+      - **Selecciona o crea la carpeta Builds/Android/** dentro del proyecto y pulsa Guardar.
 5. Unity compilará el APK, lo instalará en la tablet y lanzará la aplicación automáticamente.
-6. En tu tablet, cuando la app se abra por primera vez, acepta el permiso de la cámara.
+6. En tu tablet, cuando la app se abra por primera vez, acepta el **permiso de la cámara**.
 7. Apunta la cámara a una superficie plana (suelo, mesa) para ver los quads semitransparentes, o apunta a la imagen impresa (marcador) para que se instancie el objeto 3D.
 
 ## Probar en el Editor (Simulación)
