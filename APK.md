@@ -80,8 +80,8 @@ Pasos necesarios para configurar el proyecto y generar el APK que se instalará 
 
 ## Escenas implementadas en Assets/Scenes
 
-1. SampleScene: Escena por defecto de Unity.
-2. ARPlane: La cámara detecta planos (horizontales y verticales) y proyecta quads semitransparentes sobre el plano que detecta.
+1. **SampleScene**: Escena por defecto de Unity.
+2. **ARPlane**: La cámara detecta planos (horizontales y verticales) y proyecta quads semitransparentes sobre el plano que detecta.
       - Tiene errores, no proyecta correctamente los quads sobre los planos que detecta. Es impreciso.
-3. ARQR: La cámara trackea una imágen QR almacenada en Assets/ReferenceImages y luego proyecta un Cubo sobre el QR de referencia.
+3. **ARQR**: La cámara trackea una imágen QR almacenada en Assets/ReferenceImages y luego proyecta un Cubo sobre el QR de referencia.
       - Es batante más preciso, se puede mover la cámara y el cubo se mantiene en su posición. Pero aún falta presición y ubicación de la imágen.
