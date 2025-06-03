@@ -45,14 +45,14 @@ Pasos necesarios para configurar el proyecto y generar el APK que se instalará 
 2. Si aún no existe, haz clic en Add Build Profile. Ponle un nombre descriptivo como Android-AR.
 3. En la sección Platforms, marca Android y desmarca cualquier otra plataforma.
 4. Abajo, verifica que aparezca tu dispositivo en Run Device (p. ej. “Xiaomi Pad 5”). Si tu dispositivo no aparece, pulsa Refresh.
-5. **Marca Override Global Scene List y añade solo la escena AR (por defecto suele ser SampleScene). Reemplázala o añádela así**:
-        - Abre la carpeta Assets/Scenes/, selecciona tu archivo de escena AR (p. ej. AR_Scene.unity) y haz clic en Add Open Scene.
-        - Elimina la SampleScene de la lista si no la vas a usar y asegurate de marcar la escena que quieras construir.
-6. **Haz clic en Player Settings (arriba a la derecha en Build Profiles) y verifica lo siguiente en Android → Other Settings**:
-        - Scripting Backend = IL2CPP
-        - Target Architectures = ARM64
-        - Minimum API Level ≥ 26
-7. En el mismo Player Settings, selecciona XR Plug-in Management, pestaña Android y marca Google ARCore. Dentro de ARCore, puedes dejar Requirement = Required y Depth = Optional.
+5. Marca Override Global Scene List y añade solo la escena AR (por defecto suele ser SampleScene). Reemplázala o añádela así:
+      - Abre la carpeta Assets/Scenes/, selecciona tu archivo de escena AR (p. ej. AR_Scene.unity) y haz clic en Add Open Scene.
+      - Elimina la SampleScene de la lista si no la vas a usar y asegurate de marcar la escena que quieras construir.
+7. Haz clic en Player Settings (arriba a la derecha en Build Profiles) y verifica lo siguiente en Android → Other Settings:
+      - Scripting Backend = IL2CPP
+      - Target Architectures = ARM64
+      - Minimum API Level ≥ 26
+8. En el mismo Player Settings, selecciona XR Plug-in Management, pestaña Android y marca Google ARCore. Dentro de ARCore, puedes dejar Requirement = Required y Depth = Optional.
 
 ## Generar el APK en dispositivo android
 
