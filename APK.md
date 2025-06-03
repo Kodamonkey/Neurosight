@@ -1,27 +1,6 @@
 # NeuroSight - Rama ARCORE
 
-Pasos necesarios para configurar el proyecto, preparar la escena AR y generar el APK que se instalará en un dispositivo Android compatible con ARCore.
-
----
-
-## Índice
-
-1. [Requisitos Previos](#requisitos-previos)  
-2. [Instalación de Unity 6.1 LTS con Android Build Support](#instalación-de-unity-61-lts-con-android-build-support)  
-3. [Abrir el Proyecto NeuroSight](#abrir-el-proyecto-neurosight)  
-4. [Configuración de Build Profiles / Build Settings](#configuración-de-build-profiles--build-settings)  
-5. [Importar Paquetes de AR Foundation y ARCore](#importar-paquetes-de-ar-foundation-y-arcore)  
-6. [Configurar la Escena AR](#configurar-la-escena-ar)  
-   - 6.1. [Crear el Prefab de Plano (ARPlanePrefab)](#61-crear-el-prefab-de-plano-arplaneprefab)  
-   - 6.2. [Configurar XR Origin y AR Session](#62-configurar-xr-origin-y-ar-session)  
-   - 6.3. [Agregar AR Plane Manager y Prefab de Plano](#63-agregar-ar-plane-manager-y-prefab-de-plano)  
-   - 6.4. [Configurar Detección de Imágenes (AR Tracked Images)](#64-configurar-detección-de-imágenes-ar-tracked-images)  
-7. [Probar en el Editor (Simulación)](#probar-en-el-editor-simulación)  
-8. [Generar e Instalar el APK en Dispositivo Android](#generar-e-instalar-el-apk-en-dispositivo-android)  
-9. [Cerrar/Cerrar la Aplicación en Android](#cerrarcerrar-la-aplicación-en-android)  
-10. [Consejos y Consideraciones Adicionales](#consejos-y-consideraciones-adicionales)  
-
----
+Pasos necesarios para configurar el proyecto y generar el APK que se instalará en un dispositivo Android compatible con ARCore.
 
 ## Requisitos Previos
 
