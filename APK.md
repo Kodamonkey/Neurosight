@@ -68,7 +68,7 @@ Pasos necesarios para configurar el proyecto y generar el APK que se instalará 
 
 ## Probar en el Editor (Simulación)
 
-# Importante: no se ha probado levantar las escenas en simulación todavía.
+### Importante: no se ha probado levantar las escenas en simulación todavía.
 
 1. En Window → Package Manager, dentro de AR Foundation, importa el AR Simulation sample.
 2. Ve a Edit → Project Settings → AR Simulation y marca Enable Simulation.
