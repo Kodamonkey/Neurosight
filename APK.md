@@ -68,8 +68,6 @@ Pasos necesarios para configurar el proyecto y generar el APK que se instalará 
 
 ## Probar en el Editor (Simulación)
 
-### Importante: no se ha probado levantar las escenas en simulación todavía.
-
 1. En Window → Package Manager, dentro de AR Foundation, importa el AR Simulation sample.
 2. Ve a Edit → Project Settings → AR Simulation y marca Enable Simulation.
 3. Abre Window → XR → AR Simulation.
@@ -77,6 +75,8 @@ Pasos necesarios para configurar el proyecto y generar el APK que se instalará 
       - Para probar detección de planos: haz clic en Add Plane y mueve la cámara virtual (WASD+mouse) hasta “ver” el plano.
       - Para probar detección de imágenes: en “Image” asigna tu PNG de referencia y haz clic en Add Image. Luego mueve la cámara virtual hasta “ver” esa imagen simulada.
 5. Observa en la Game View cómo se instancian los quads semitransparentes (planos) y los objetos 3D al detectar la imagen.
+
+### Importante: no se ha probado levantar las escenas en simulación todavía.
 
 ## Escenas implementadas en Assets/Scenes
 
