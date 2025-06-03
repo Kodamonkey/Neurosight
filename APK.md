@@ -8,8 +8,8 @@ Pasos necesarios para configurar el proyecto y generar el APK que se instalará 
 2. **Unity Hub**: versión más reciente (`https://unity.com/download`).  
 3. **Cuenta de Unity**: para autorizar el uso de Unity Hub.  
 4. **Tablet o Smartphone Android (API ≥ 26) compatible con ARCore**:  
-   - Debe tener instalado y actualizado “Google Play Services for AR”.  
-   - Activar “Opciones de desarrollador”, “Depuración USB” e “Instalar vía USB” en el dispositivo.  
+      - Debe tener instalado y actualizado “Google Play Services for AR”.  
+      - Activar “Opciones de desarrollador”, “Depuración USB” e “Instalar vía USB” en el dispositivo.  
 5. **Cable USB con transferencia de datos** (para instalar el APK).  
 
 ---
