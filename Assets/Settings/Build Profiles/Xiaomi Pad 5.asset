@@ -23,6 +23,8 @@ MonoBehaviour:
   - m_enabled: 0
     m_path: Assets/Scenes/ARPlane.unity
   - m_enabled: 1
+    m_path: Assets/Scenes/Index.unity
+  - m_enabled: 1
     m_path: Assets/Scenes/ARQR.unity
   m_ScriptingDefines: []
   m_PlayerSettingsYaml:
@@ -49,7 +51,7 @@ MonoBehaviour:
         m_ExportAsGoogleAndroidProject: 0
         m_DebugSymbolLevel: 1
         m_DebugSymbolFormat: 5
-        m_CurrentDeploymentTargetId: 98a4dc1
+        m_CurrentDeploymentTargetId: R5CX70XCQ9N
         m_BuildType: 2
         m_BuildAppBundle: 0
         m_IPAddressToConnect: 

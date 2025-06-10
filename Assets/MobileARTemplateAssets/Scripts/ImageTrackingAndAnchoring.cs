@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
+using UnityEngine.Events;    // ← imprescindible para UnityEvent<>
 
 [RequireComponent(typeof(ARTrackedImageManager))]
 public class ImageTrackingAndAnchoring : MonoBehaviour
@@ -10,10 +11,21 @@ public class ImageTrackingAndAnchoring : MonoBehaviour
 
     bool placed = false;
 
-    void OnEnable()  => trackedImageManager.trackedImagesChanged += OnTrackedImagesChanged;
-    void OnDisable() => trackedImageManager.trackedImagesChanged -= OnTrackedImagesChanged;
+    void OnEnable()
+    {
+        if (trackedImageManager.trackablesChanged != null)
+            trackedImageManager.trackablesChanged.AddListener(OnTrackedImagesChanged);
+        else
+            Debug.LogWarning("trackablesChanged es null. Actualiza AR Foundation a 6.0.0-pre.5 o superior.");
+    }
 
-    void OnTrackedImagesChanged(ARTrackedImagesChangedEventArgs args)
+    void OnDisable()
+    {
+        if (trackedImageManager.trackablesChanged != null)
+            trackedImageManager.trackablesChanged.RemoveListener(OnTrackedImagesChanged);
+    }
+
+    void OnTrackedImagesChanged(ARTrackablesChangedEventArgs<ARTrackedImage> args)
     {
         if (placed) return;
 
@@ -22,22 +34,17 @@ public class ImageTrackingAndAnchoring : MonoBehaviour
             if (img.trackingState != TrackingState.Tracking)
                 continue;
 
-            // 1) Crear un GameObject vacío en la pose de la imagen
             var anchorGO = new GameObject("ImageAnchor");
             anchorGO.transform.position = img.transform.position;
             anchorGO.transform.rotation = img.transform.rotation;
 
-            // 2) Añadirle el componente ARAnchor
-            ARAnchor anchorComp = anchorGO.AddComponent<ARAnchor>();
-            if (anchorComp == null)
-                continue;
+            var anchorComp = anchorGO.AddComponent<ARAnchor>();
+            if (anchorComp == null) continue;
 
-            // 3) Instanciar tu prefab como hijo del anchor
             var go = Instantiate(brainPrefab, anchorGO.transform);
             go.transform.localPosition = Vector3.zero;
             go.transform.localRotation = Quaternion.identity;
 
-            // 4) Marcar y deshabilitar más trackeos
             placed = true;
             trackedImageManager.enabled = false;
             break;
