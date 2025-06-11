@@ -1,46 +1,81 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 
 [RequireComponent(typeof(ARTrackedImageManager))]
+[RequireComponent(typeof(ARAnchorManager))]
 public class ImageTrackingAndAnchoring : MonoBehaviour
 {
-    [SerializeField] ARTrackedImageManager trackedImageManager;
-    [SerializeField] GameObject           brainPrefab;
+    [SerializeField]
+    private ARTrackedImageManager trackedImageManager;
 
-    bool placed = false;
+    [SerializeField]
+    private ARAnchorManager anchorManager;
 
-    void OnEnable()  => trackedImageManager.trackedImagesChanged += OnTrackedImagesChanged;
-    void OnDisable() => trackedImageManager.trackedImagesChanged -= OnTrackedImagesChanged;
+    [SerializeField]
+    private GameObject brainPrefab;
 
-    void OnTrackedImagesChanged(ARTrackedImagesChangedEventArgs args)
+    private bool placed = false;
+
+    void Awake()
     {
-        if (placed) return;
+        if (trackedImageManager == null)
+            trackedImageManager = GetComponent<ARTrackedImageManager>();
+        if (anchorManager == null)
+            anchorManager = GetComponent<ARAnchorManager>();
+    }
 
-        foreach (var img in args.added)
+    void OnEnable()
+    {
+        trackedImageManager.trackedImagesChanged += OnTrackedImagesChanged;
+    }
+
+    void OnDisable()
+    {
+        trackedImageManager.trackedImagesChanged -= OnTrackedImagesChanged;
+    }
+
+    private void OnTrackedImagesChanged(ARTrackedImagesChangedEventArgs args)
+    {
+        foreach (var img in args.added.Concat(args.updated))
         {
-            if (img.trackingState != TrackingState.Tracking)
+            if (placed || img.trackingState != TrackingState.Tracking)
                 continue;
 
-            // 1) Crear un GameObject vacío en la pose de la imagen
-            var anchorGO = new GameObject("ImageAnchor");
-            anchorGO.transform.position = img.transform.position;
-            anchorGO.transform.rotation = img.transform.rotation;
+            // Lanza la creación asíncrona del anchor
+            CreateAnchorAsync(img);
+            break; // Solo uno
+        }
+    }
 
-            // 2) Añadirle el componente ARAnchor
-            ARAnchor anchorComp = anchorGO.AddComponent<ARAnchor>();
-            if (anchorComp == null)
-                continue;
+    private async void CreateAnchorAsync(ARTrackedImage img)
+    {
+        // Genera el pose de anclaje
+        var pose = new Pose(img.transform.position, img.transform.rotation);
 
-            // 3) Instanciar tu prefab como hijo del anchor
-            var go = Instantiate(brainPrefab, anchorGO.transform);
+        // Intenta crear el anchor de forma asíncrona
+        var result = await anchorManager.TryAddAnchorAsync(pose);
+        if (result.status.IsSuccess())
+        {
+            var anchor = result.value;
+            Debug.Log($"[AnchorScript] Anchor creado en posición: {pose.position}");
+
+            // Instanciar el prefab como hijo del anchor
+            var go = Instantiate(brainPrefab, anchor.transform);
             go.transform.localPosition = Vector3.zero;
             go.transform.localRotation = Quaternion.identity;
 
-            // 4) Marcar y deshabilitar más trackeos
+            Debug.Log($"[AnchorScript] Instanciado prefab en {anchor.transform.position}");
+
+            // Marcar y desuscribir
             placed = true;
-            trackedImageManager.enabled = false;
-            break;
+            trackedImageManager.trackedImagesChanged -= OnTrackedImagesChanged;
+        }
+        else
+        {
+            Debug.LogWarning($"[AnchorScript] TryAddAnchorAsync falló con estado: {result.status}");
         }
     }
 }

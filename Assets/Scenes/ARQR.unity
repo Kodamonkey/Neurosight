@@ -177,6 +177,7 @@ GameObject:
   - component: {fileID: 685060388}
   - component: {fileID: 685060387}
   - component: {fileID: 685060389}
+  - component: {fileID: 685060391}
   - component: {fileID: 685060390}
   m_Layer: 0
   m_Name: XR Origin (Mobile AR)
@@ -264,8 +265,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   trackedImageManager: {fileID: 685060389}
+  anchorManager: {fileID: 685060391}
   brainPrefab: {fileID: 891577192361443708, guid: e9c7736caf004654ebdef686b37c2503,
     type: 3}
+--- !u!114 &685060391
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 685060382}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 728ad7fae8e460a4ba41265c7308d757, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <trackablesChanged>k__BackingField:
+    m_PersistentCalls:
+      m_Calls: []
+  m_AnchorPrefab: {fileID: 0}
 --- !u!1 &959564245
 GameObject:
   m_ObjectHideFlags: 0
