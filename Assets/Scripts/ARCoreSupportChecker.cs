@@ -8,19 +8,18 @@ public class ARCoreSupportChecker : MonoBehaviour
     [Header("UI References")]
     public TMP_Text warningText;
 
-    async void Start()
+    IEnumerator Start()
     {
-        SessionAvailability availability = await ARSession.CheckAvailability();
+        // Check AR support on the current device
+        yield return ARSession.CheckAvailability();
 
-        if (availability == SessionAvailability.Supported)
+        if (ARSession.state == ARSessionState.NeedsInstall)
         {
-            return; // ARCore is ready
+            // Request AR package installation
+            yield return ARSession.Install();
         }
-        else if (availability == SessionAvailability.NeedsInstall)
-        {
-            await ARSession.Install();
-        }
-        else if (availability == SessionAvailability.Unsupported)
+
+        if (ARSession.state == ARSessionState.Unsupported)
         {
             if (warningText != null)
             {
