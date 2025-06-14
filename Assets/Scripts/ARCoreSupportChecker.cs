@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
@@ -10,12 +11,12 @@ public class ARCoreSupportChecker : MonoBehaviour
 
     IEnumerator Start()
     {
-        // Check AR support on the current device
+        // Verifica la compatibilidad AR en el dispositivo actual.
         yield return ARSession.CheckAvailability();
 
         if (ARSession.state == ARSessionState.NeedsInstall)
         {
-            // Request AR package installation
+            // Solicita la instalación del paquete AR.
             yield return ARSession.Install();
         }
 
@@ -24,6 +25,15 @@ public class ARCoreSupportChecker : MonoBehaviour
             if (warningText != null)
             {
                 warningText.text = "ARCore no soportado";
+                warningText.gameObject.SetActive(true);
+            }
+        }
+        else
+        {
+            // Si es compatible, muestra un mensaje indicando lo mismo.
+            if (warningText != null)
+            {
+                warningText.text = "ARCore soportado";
                 warningText.gameObject.SetActive(true);
             }
         }
