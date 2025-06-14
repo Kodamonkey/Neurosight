@@ -64,9 +64,9 @@
 
 ### Verificar soporte ARCore
 
-La escena `Index.unity` incluye el script `ARCoreSupportChecker` que comprueba la disponibilidad de ARCore al iniciar la aplicación.
+La escena `Index.unity` incluye el script `ARCoreSupportChecker` que comprueba la disponibilidad de ARCore al iniciar la aplicación. Tras cada llamada a `ARSession.CheckAvailability()` y `ARSession.Install()`, el script revisa `ARSession.state`.
 
-- **Supported** → la app continúa normalmente.
+- **Ready** → la app continúa normalmente.
 - **NeedsInstall** → se solicita instalar ARCore.
 - **Unsupported** → se muestra un mensaje en pantalla indicando que el dispositivo no es compatible.
 
