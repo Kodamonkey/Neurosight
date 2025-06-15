@@ -26,13 +26,13 @@ public class ARCoreSupportChecker : MonoBehaviour
 
         if (ARSession.state == ARSessionState.Unsupported)
         {
-            ShowPopup("ARCore no soportado");
+            ShowPopup("Dispositivo no compatible con la Aplicación"); // ARCore no soportado
         }
         else
         {
             if (warningText != null)
             {
-                warningText.text = "ARCore soportado";
+                warningText.text = "Dispositivo Compatible con la Aplicación";
                 warningText.gameObject.SetActive(true);
             }
         }
@@ -40,11 +40,17 @@ public class ARCoreSupportChecker : MonoBehaviour
 
     void ShowPopup(string message)
     {
+        // Si no hay Canvas definido, usa warningText.
         if (uiCanvas == null)
         {
             if (warningText != null)
             {
                 warningText.text = message;
+                // Si es el mensaje de incompatibilidad, lo pinta de rojo.
+                if(message == "Dispositivo no compatible con la Aplicación")
+                    warningText.color = Color.red;
+                else
+                    warningText.color = Color.white;
                 warningText.gameObject.SetActive(true);
             }
             return;
@@ -84,6 +90,11 @@ public class ARCoreSupportChecker : MonoBehaviour
         if (popupText != null)
         {
             popupText.text = message;
+            // Pone en rojo el mensaje si es de incompatibilidad.
+            if (message == "Dispositivo no compatible con la Aplicación")
+                popupText.color = Color.red;
+            else
+                popupText.color = Color.white;
         }
 
         popupInstance.SetActive(true);
