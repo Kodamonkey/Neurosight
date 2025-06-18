@@ -38,7 +38,7 @@ public class ARCoreSupportChecker : MonoBehaviour
         }
     }
 
-    void ShowPopup(string message)
+    public void ShowPopup(string message)
     {
         // Si no hay Canvas definido, usa warningText.
         if (uiCanvas == null)
