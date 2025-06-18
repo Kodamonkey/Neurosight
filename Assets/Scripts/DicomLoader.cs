@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using SimpleFileBrowser;       // plugin
+using Dicom;
 
 public class DicomLoader : MonoBehaviour
 {
@@ -17,8 +18,20 @@ public class DicomLoader : MonoBehaviour
         FileBrowser.ShowLoadDialog( ( paths ) => {
                 string path = paths[0];
                 fileNameText.text = System.IO.Path.GetFileName(path);
-                // Aquí podrías parsear:
-                // var dcm = DicomFile.Open(path);
+
+                var checker = FindObjectOfType<ARCoreSupportChecker>();
+                try
+                {
+                    var dcm = DicomFile.Open(path);
+                    if (checker != null)
+                        checker.ShowPopup("Archivo DICOM cargado correctamente");
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogError($"Error al cargar DICOM: {ex.Message}");
+                    if (checker != null)
+                        checker.ShowPopup("Error al cargar DICOM. Intenta de nuevo");
+                }
                 // …crear tu objeto 3D, mesh, textura, etc.
             },
             () => {
