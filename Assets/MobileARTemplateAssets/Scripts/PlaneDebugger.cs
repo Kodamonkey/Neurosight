@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
+using UnityEngine.Events;
 
 [RequireComponent(typeof(ARPlaneManager))]
 public class PlaneDebugger : MonoBehaviour
@@ -10,10 +11,23 @@ public class PlaneDebugger : MonoBehaviour
     void Awake()
     {
         _planeManager = GetComponent<ARPlaneManager>();
-        _planeManager.planesChanged += OnPlanesChanged;
     }
 
-    void OnPlanesChanged(ARPlanesChangedEventArgs args)
+    void OnEnable()
+    {
+        if (_planeManager.trackablesChanged != null)
+            _planeManager.trackablesChanged.AddListener(OnPlanesChanged);
+        else
+            Debug.LogWarning("trackablesChanged es null. Actualiza AR Foundation.");
+    }
+
+    void OnDisable()
+    {
+        if (_planeManager.trackablesChanged != null)
+            _planeManager.trackablesChanged.RemoveListener(OnPlanesChanged);
+    }
+
+    void OnPlanesChanged(ARTrackablesChangedEventArgs<ARPlane> args)
     {
         foreach (var p in args.added)
             Debug.Log($"[PlaneDebugger] Plano añadido en {p.center}");
@@ -21,10 +35,5 @@ public class PlaneDebugger : MonoBehaviour
             Debug.Log($"[PlaneDebugger] Plano actualizado en {p.center}");
         foreach (var p in args.removed)
             Debug.Log($"[PlaneDebugger] Plano eliminado");
-    }
-
-    void OnDestroy()
-    {
-        _planeManager.planesChanged -= OnPlanesChanged;
     }
 }
