@@ -1,25 +1,42 @@
 using UnityEngine;
-using SFB;
+using SFB;  // Standalone File Browser
 
 public class FileSelector : MonoBehaviour
 {
+    [Tooltip("Arrastra aquí el GameObject con el MedicalMeshLoader")]
     public MedicalMeshLoader loader;
 
-    public void SelectNifti()
+    /// <summary>
+    /// Selecciona un .nii y lo carga como “Brain”
+    /// </summary>
+    public void SelectBrainNifti()
     {
-        var paths = StandaloneFileBrowser.OpenFilePanel("Selecciona archivo NIfTI", "", "nii", false);
+        // TERCER PARÁMETRO: extensión como string, NO string[]
+        string[] paths = StandaloneFileBrowser.OpenFilePanel(
+            "Selecciona volúmen NIfTI (cerebro)",  // título
+            "",                                    // directorio inicial
+            "nii",                                 // extensión permitida
+            false                                  // no multiselección
+        );
+
         if (paths.Length > 0 && !string.IsNullOrEmpty(paths[0]))
-        {
-            loader.LoadMedicalFile(paths[0], false);
-        }
+            loader.LoadBrainFile(paths[0]);
     }
 
-    public void SelectDicomFolder()
+    /// <summary>
+    /// Selecciona un .nii y lo carga como “Tumor”
+    /// </summary>
+    public void SelectTumorNifti()
     {
-        var path = StandaloneFileBrowser.OpenFolderPanel("Selecciona carpeta DICOM", "", false);
-        if (path.Length > 0 && !string.IsNullOrEmpty(path[0]))
-        {
-            loader.LoadMedicalFile(path[0], true);
-        }
+        string[] paths = StandaloneFileBrowser.OpenFilePanel(
+            "Selecciona volúmen NIfTI (tumor)",
+            "",
+            "nii",
+            false
+        );
+
+        if (paths.Length > 0 && !string.IsNullOrEmpty(paths[0]))
+            loader.LoadTumorFile(paths[0]);
     }
 }
+
