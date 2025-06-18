@@ -90,3 +90,13 @@ main   ←  estable, solo demos/versiones
 - **feature/\***: rama por Historia de Usuario o tarea (< 3-4 días).
 - **hotfix/\***: correcciones urgentes desde _main_ (se cherry-pickean a _dev_).
 - Para pasar a main solo sera a traves de PR.
+
+---
+
+## 6 · Fusión de cerebro y tumor
+
+El script **MedicalMeshLoader** ahora agrupa el cerebro y el tumor en un
+objeto raíz llamado `BrainTumorCombined`. Al cargar ambos modelos se
+aplican materiales por defecto: el cerebro se muestra en blanco
+semitransparente y el tumor en rojo sólido. Esto permite apreciar la
+relación espacial de forma inmediata y moverlos como una única entidad.

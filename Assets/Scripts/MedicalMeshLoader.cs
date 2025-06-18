@@ -21,6 +21,34 @@ public class MedicalMeshLoader : MonoBehaviour
     public Material brainMaterial;   // blanco semitransparente
     public Material tumorMaterial;   // rojo sólido
 
+    [Header("Objeto raíz para la fusión")]
+    public string parentObjectName = "BrainTumorCombined";
+
+    void Awake()
+    {
+        // Si no se asignaron materiales desde el inspector, crea unos por defecto
+        if (brainMaterial == null)
+        {
+            brainMaterial = new Material(Shader.Find("Standard"));
+            var c = Color.white;
+            c.a = 0.3f;                    // Semitransparente
+            brainMaterial.color = c;
+            brainMaterial.SetFloat("_Mode", 3);
+            brainMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+            brainMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+            brainMaterial.SetInt("_ZWrite", 0);
+            brainMaterial.DisableKeyword("_ALPHATEST_ON");
+            brainMaterial.EnableKeyword("_ALPHABLEND_ON");
+            brainMaterial.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+            brainMaterial.renderQueue = 3000;
+        }
+        if (tumorMaterial == null)
+        {
+            tumorMaterial = new Material(Shader.Find("Standard"));
+            tumorMaterial.color = Color.red;
+        }
+    }
+
     /// <summary>
     /// Invocado desde FileSelector para cargar el cerebro
     /// </summary>
@@ -139,6 +167,17 @@ public class MedicalMeshLoader : MonoBehaviour
         go.transform.position   = Vector3.zero;
         go.transform.rotation   = Quaternion.Euler(-90, 0, 0);
         go.transform.localScale = Vector3.one;
+
+        // Asegura objeto raíz para agrupar cerebro y tumor
+        var parent = GameObject.Find(parentObjectName);
+        if (parent == null)
+        {
+            parent = new GameObject(parentObjectName);
+            parent.transform.position = Vector3.zero;
+            parent.transform.rotation = Quaternion.identity;
+            parent.transform.localScale = Vector3.one;
+        }
+        go.transform.SetParent(parent.transform, false);
 
         Debug.Log($"✅ {goName} cargado y añadido a la escena.");
     }
