@@ -58,9 +58,17 @@
 2. **Abre** el proyecto en **Unity Hub**  
    _Add project → neurosight → abrir con Unity 6.1 LTS_.
 
-3. **Resuelve dependencias**  
-   El editor descargará automáticamente los paquetes del _Package Manager_.  
+3. **Resuelve dependencias**
+   El editor descargará automáticamente los paquetes del _Package Manager_.
    Si aparece un diálogo “Project upgrade?”, acepta la actualización.
+
+### Verificar soporte ARCore
+
+La escena `Index.unity` incluye el script `ARCoreSupportChecker` que comprueba la disponibilidad de ARCore al iniciar la aplicación. Tras cada llamada a `ARSession.CheckAvailability()` y `ARSession.Install()`, el script revisa `ARSession.state`.
+
+- **Ready** → la app continúa normalmente.
+- **NeedsInstall** → se solicita instalar ARCore.
+- **Unsupported** → se muestra un mensaje en pantalla indicando que el dispositivo no es compatible.
 
 ---
 
