@@ -246,7 +246,6 @@ public class MedicalMeshLoader : MonoBehaviour
         Debug.Log($"✅ Prefab fusionado guardado en {fusedPrefabPath}");
     }
 #endif
-
     string MeshToObj(Mesh m)
     {
         var sb = new StringBuilder();
