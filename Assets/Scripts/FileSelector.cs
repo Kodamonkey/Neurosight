@@ -1,42 +1,40 @@
 using UnityEngine;
-using SFB;  // Standalone File Browser
+using SimpleFileBrowser;
+using System.Collections;
 
 public class FileSelector : MonoBehaviour
 {
     [Tooltip("Arrastra aquí el GameObject con el MedicalMeshLoader")]
     public MedicalMeshLoader loader;
 
-    /// <summary>
-    /// Selecciona un .nii y lo carga como “Brain”
-    /// </summary>
     public void SelectBrainNifti()
     {
-        // TERCER PARÁMETRO: extensión como string, NO string[]
-        string[] paths = StandaloneFileBrowser.OpenFilePanel(
-            "Selecciona volúmen NIfTI (cerebro)",  // título
-            "",                                    // directorio inicial
-            "nii",                                 // extensión permitida
-            false                                  // no multiselección
-        );
-
-        if (paths.Length > 0 && !string.IsNullOrEmpty(paths[0]))
-            loader.LoadBrainFile(paths[0]);
+        StartCoroutine(ShowLoadDialogCoroutine(loader.LoadBrainFile));
     }
 
-    /// <summary>
-    /// Selecciona un .nii y lo carga como “Tumor”
-    /// </summary>
     public void SelectTumorNifti()
     {
-        string[] paths = StandaloneFileBrowser.OpenFilePanel(
-            "Selecciona volúmen NIfTI (tumor)",
-            "",
-            "nii",
-            false
+        StartCoroutine(ShowLoadDialogCoroutine(loader.LoadTumorFile));
+    }
+
+    private IEnumerator ShowLoadDialogCoroutine(System.Action<string> callback)
+    {
+        // Filtro para solo archivos .nii
+        FileBrowser.SetFilters(true, new FileBrowser.Filter("NIfTI", ".nii"));
+        FileBrowser.SetDefaultFilter(".nii");
+
+        // Esperar al diálogo de selección de archivo (PickFiles, sin múltiples archivos)
+        yield return FileBrowser.WaitForLoadDialog(
+            FileBrowser.PickMode.Files,    // <- CORRECTO
+            false,                         // No multiselección
+            null,                          // Ruta inicial
+            null                           // Nombre de archivo por defecto
         );
 
-        if (paths.Length > 0 && !string.IsNullOrEmpty(paths[0]))
-            loader.LoadTumorFile(paths[0]);
+        // Si se seleccionó un archivo, ejecutar el callback
+        if (FileBrowser.Success && FileBrowser.Result != null && FileBrowser.Result.Length > 0)
+        {
+            callback.Invoke(FileBrowser.Result[0]);
+        }
     }
 }
-
