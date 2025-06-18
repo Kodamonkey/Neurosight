@@ -2,6 +2,7 @@ using UnityEngine;
 using System.IO;
 using System.Diagnostics;      // Para ProcessStartInfo, Process
 using System.Collections;
+using System.Text;
 #if UNITY_EDITOR
 using UnityEditor;             // AssetDatabase
 #endif
@@ -16,6 +17,15 @@ public class MedicalMeshLoader : MonoBehaviour
     [Header("Paths de salida OBJ dentro de Assets/Models/")]
     public string brainObjPath = "Assets/Models/brain_model.obj";
     public string tumorObjPath = "Assets/Models/tumor_model.obj";
+    [Header("Salida modelo fusionado")]
+    public string fusedObjPath = "Assets/Models/fused_model.obj";
+    public string fusedPrefabPath = "Assets/Models/FusedModel.prefab";
+    public bool saveAsPrefab = true;
+    public bool showModelsInScene = false;
+
+    private Mesh brainMesh;
+    private Mesh tumorMesh;
+
 
     [Header("Materiales")]
     public Material brainMaterial;   // blanco semitransparente
@@ -124,6 +134,12 @@ public class MedicalMeshLoader : MonoBehaviour
             Debug.LogError("❌ No se pudo cargar el mesh: " + relativePath);
             yield break;
         }
+        if (goName == "BrainModel") brainMesh = mesh;
+        else if (goName == "TumorModel") tumorMesh = mesh;
+        if (!showModelsInScene) {
+            TrySaveMergedMesh();
+            yield break;
+        }
 
         // Si ya existía, lo destruye
         var oldGO = GameObject.Find(goName);
@@ -162,9 +178,8 @@ public class MedicalMeshLoader : MonoBehaviour
         go.transform.rotation   = Quaternion.Euler(-90, 0, 0);
         go.transform.localScale = Vector3.one;
 
-        TryMergeModels();
-
-        Debug.Log($"✅ {goName} cargado y añadido a la escena.");
+        if (showModelsInScene)
+            TryMergeModels();
     }
 
     void TryMergeModels()
@@ -176,6 +191,79 @@ public class MedicalMeshLoader : MonoBehaviour
             tumor.transform.SetParent(brain.transform, true);
         }
     }
+    void TrySaveMergedMesh()
+    {
+        if (brainMesh != null && tumorMesh != null)
+        {
+            var combine = new CombineInstance[2];
+            combine[0].mesh = brainMesh;
+            combine[0].transform = Matrix4x4.identity;
+            combine[1].mesh = tumorMesh;
+            combine[1].transform = Matrix4x4.identity;
+            var merged = new Mesh();
+            merged.CombineMeshes(combine, true, false);
+            string full = Path.GetFullPath(fusedObjPath).Replace("\\","/");
+            File.WriteAllText(full, MeshToObj(merged));
+#if UNITY_EDITOR
+            AssetDatabase.Refresh();
+#endif
+            Debug.Log($"✅ Modelos fusionados guardados en {fusedObjPath}");
+#if UNITY_EDITOR
+            if (saveAsPrefab)
+                SaveMergedPrefab(merged);
+#endif
+        }
+    }
+
+#if UNITY_EDITOR
+    void SaveMergedPrefab(Mesh merged)
+    {
+        var root = new GameObject("FusedModel");
+        root.hideFlags = HideFlags.HideAndDontSave;
+        var brainGO = new GameObject("BrainModel");
+        brainGO.hideFlags = HideFlags.HideAndDontSave;
+        var brainMF = brainGO.AddComponent<MeshFilter>();
+        brainMF.sharedMesh = brainMesh;
+        var brainMR = brainGO.AddComponent<MeshRenderer>();
+        var brainMat = brainMaterial != null ? new Material(brainMaterial) : new Material(Shader.Find("Standard"));
+        Color bc = brainMat.color; bc.a = 0.4f; brainMat.color = bc;
+        brainMR.sharedMaterial = brainMat;
+        brainGO.transform.SetParent(root.transform, false);
+
+        var tumorGO = new GameObject("TumorModel");
+        tumorGO.hideFlags = HideFlags.HideAndDontSave;
+        var tumorMF = tumorGO.AddComponent<MeshFilter>();
+        tumorMF.sharedMesh = tumorMesh;
+        var tumorMR = tumorGO.AddComponent<MeshRenderer>();
+        var tumorMat = tumorMaterial != null ? new Material(tumorMaterial) : new Material(Shader.Find("Standard"));
+        tumorMat.color = Color.red;
+        tumorMR.sharedMaterial = tumorMat;
+        tumorGO.transform.SetParent(brainGO.transform, false);
+
+        PrefabUtility.SaveAsPrefabAsset(root, fusedPrefabPath);
+        GameObject.DestroyImmediate(root);
+        AssetDatabase.Refresh();
+        Debug.Log($"✅ Prefab fusionado guardado en {fusedPrefabPath}");
+    }
+#endif
+
+    string MeshToObj(Mesh m)
+    {
+        var sb = new StringBuilder();
+        foreach (var v in m.vertices) sb.AppendLine($"v {v.x} {v.y} {v.z}");
+        foreach (var n in m.normals) sb.AppendLine($"vn {n.x} {n.y} {n.z}");
+        foreach (var uv in m.uv) sb.AppendLine($"vt {uv.x} {uv.y}");
+        int[] tris = m.triangles;
+        for (int i = 0; i < tris.Length; i += 3)
+        {
+            int a = tris[i] + 1;
+            int b = tris[i+1] + 1;
+            int c = tris[i+2] + 1;
+            sb.AppendLine($"f {a}/{a}/{a} {b}/{b}/{b} {c}/{c}/{c}");
+        }
+        return sb.ToString();
+    }
+
 }
 
 
