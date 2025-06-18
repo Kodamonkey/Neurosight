@@ -266,7 +266,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   trackedImageManager: {fileID: 685060389}
   anchorManager: {fileID: 685060391}
-  brainPrefab: {fileID: 891577192361443708, guid: e9c7736caf004654ebdef686b37c2503,
+  brainPrefab: {fileID: 1651479453254147936, guid: 67e57c589dd50e547b65388d0d2225aa,
     type: 3}
 --- !u!114 &685060391
 MonoBehaviour:

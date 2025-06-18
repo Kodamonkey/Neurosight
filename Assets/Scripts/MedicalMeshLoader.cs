@@ -1,12 +1,10 @@
 using UnityEngine;
 using System.IO;
-using System.Diagnostics;      // Para ProcessStartInfo, Process
 using System.Collections;
 #if UNITY_EDITOR
-using UnityEditor;             // AssetDatabase
+using UnityEditor;
+using UnityEditor.SceneManagement;
 #endif
-// Alias para desambiguar Debug
-using Debug = UnityEngine.Debug;
 
 public class MedicalMeshLoader : MonoBehaviour
 {
@@ -17,131 +15,104 @@ public class MedicalMeshLoader : MonoBehaviour
     public string brainObjPath = "Assets/Models/brain_model.obj";
     public string tumorObjPath = "Assets/Models/tumor_model.obj";
 
-    [Header("Materiales")]
-    public Material brainMaterial;   // blanco semitransparente
-    public Material tumorMaterial;   // rojo sólido
+    [Header("Materiales para cada mesh")]
+    public Material brainMaterial;
+    public Material tumorMaterial;
 
-    /// <summary>
-    /// Invocado desde FileSelector para cargar el cerebro
-    /// </summary>
+    [Header("Ruta de salida para el prefab combinado")]  
+    public string combinedPrefabPath = "Assets/Models/CombinedMedicalModel.prefab";
+
+    private Mesh brainMesh;
+    private Mesh tumorMesh;
+
     public void LoadBrainFile(string inputPath)
     {
-        StartCoroutine(RunConvertAndImport(
-            inputPath,
-            brainObjPath,
-            "nifti",
-            brainMaterial,
-            "BrainModel"
-        ));
+        StartCoroutine(ConvertAndImport(inputPath, brainObjPath, ModelType.Brain));
     }
 
-    /// <summary>
-    /// Invocado desde FileSelector para cargar el tumor
-    /// </summary>
     public void LoadTumorFile(string inputPath)
     {
-        StartCoroutine(RunConvertAndImport(
-            inputPath,
-            tumorObjPath,
-            "nifti",
-            tumorMaterial,
-            "TumorModel"
-        ));
+        StartCoroutine(ConvertAndImport(inputPath, tumorObjPath, ModelType.Tumor));
     }
 
-    IEnumerator RunConvertAndImport(
-        string input,
-        string output,
-        string tipo,
-        Material mat,
-        string goName
-    )
+    private enum ModelType { Brain, Tumor }
+
+    private IEnumerator ConvertAndImport(string inputFullPath, string objAssetPath, ModelType type)
     {
-        // Normaliza rutas para el converter
-        string exe     = Path.GetFullPath(converterExePath).Replace("\\","/");
-        string inNorm  = Path.GetFullPath(input).Replace("\\","/");
-        string outNorm = Path.GetFullPath(output).Replace("\\","/");
-        string args    = $"\"{inNorm}\" \"{outNorm}\" {tipo}";
+        string exeFull = Path.GetFullPath(converterExePath).Replace("\\", "/");
+        string inFull  = Path.GetFullPath(inputFullPath).Replace("\\", "/");
+        string outFull = Path.GetFullPath(objAssetPath).Replace("\\", "/");
+        string args    = $"\"{inFull}\" \"{outFull}\" nifti";
 
-        Debug.Log($"▶️ Convirtiendo {goName}…");
+        if (!File.Exists(exeFull) || !File.Exists(inFull)) yield break;
 
-        if (!File.Exists(exe))
+        var psi = new System.Diagnostics.ProcessStartInfo
         {
-            Debug.LogError("❌ No se encontró el ejecutable: " + exe);
-            yield break;
-        }
-        if (!File.Exists(inNorm))
-        {
-            Debug.LogError("❌ No se encontró el archivo de entrada: " + inNorm);
-            yield break;
-        }
-
-        var psi = new ProcessStartInfo {
-            FileName               = exe,
-            Arguments              = args,
-            UseShellExecute        = false,
+            FileName = exeFull,
+            Arguments = args,
+            UseShellExecute = false,
             RedirectStandardOutput = true,
-            RedirectStandardError  = true,
-            CreateNoWindow         = true
+            RedirectStandardError = true,
+            CreateNoWindow = true
         };
-        var proc = Process.Start(psi);
-        proc.BeginOutputReadLine();
-        proc.BeginErrorReadLine();
+        var proc = System.Diagnostics.Process.Start(psi);
+        proc.WaitForExit();
 
-        // Espera a que termine el converter
-        yield return new WaitUntil(() => proc.HasExited);
-
-        // Importa y renderiza
-        yield return StartCoroutine(
-            ImportAndDisplayModel(output, mat, goName)
-        );
-    }
-
-    IEnumerator ImportAndDisplayModel(
-        string path,
-        Material mat,
-        string goName
-    )
-    {
-    #if UNITY_EDITOR
-        // Fuerza a Unity a refrescar e importar el OBJ
+#if UNITY_EDITOR
         AssetDatabase.Refresh();
-        AssetDatabase.ImportAsset(path);
-    #endif
-        // Espera un frame a que termine
+        AssetDatabase.ImportAsset(objAssetPath);
         yield return null;
 
-        // Ruta relativa para AssetDatabase
-        string relativePath = path.Replace(Application.dataPath, "Assets");
-    #if UNITY_EDITOR
-        Mesh mesh = AssetDatabase.LoadAssetAtPath<Mesh>(relativePath);
-    #else
-        Mesh mesh = null; // En build necesitarías un loader OBJ en runtime
-    #endif
+        brainMesh  = (type == ModelType.Brain) ? LoadMesh(objAssetPath) : brainMesh;
+        tumorMesh  = (type == ModelType.Tumor) ? LoadMesh(objAssetPath) : tumorMesh;
 
-        if (mesh == null)
+        if (brainMesh != null && tumorMesh != null)
         {
-            Debug.LogError("❌ No se pudo cargar el mesh: " + relativePath);
-            yield break;
+            CreateCombinedPrefab();
         }
-
-        // Si ya existía, lo destruye
-        var oldGO = GameObject.Find(goName);
-        if (oldGO != null)
-            DestroyImmediate(oldGO);
-
-        // Crea y configura el GameObject
-        var go = new GameObject(goName);
-        var mf = go.AddComponent<MeshFilter>();   mf.mesh     = mesh;
-        var mr = go.AddComponent<MeshRenderer>(); mr.material = mat;
-
-        // Mismos transform para superponer
-        go.transform.position   = Vector3.zero;
-        go.transform.rotation   = Quaternion.Euler(-90, 0, 0);
-        go.transform.localScale = Vector3.one;
-
-        Debug.Log($"✅ {goName} cargado y añadido a la escena.");
+#endif
     }
+
+#if UNITY_EDITOR
+    private Mesh LoadMesh(string path)
+    {
+        Mesh m = AssetDatabase.LoadAssetAtPath<Mesh>(path);
+        if (m == null)
+            Debug.LogError($"❌ No se pudo cargar mesh de: {path}");
+        return m;
+    }
+
+    private void CreateCombinedPrefab()
+    {
+        // Crea un root GameObject vacío
+        GameObject root = new GameObject("CombinedMedicalModel");
+
+        // Cerebro
+        GameObject brainGO = new GameObject("Brain");
+        brainGO.transform.SetParent(root.transform, false);
+        var bf = brainGO.AddComponent<MeshFilter>(); bf.sharedMesh = brainMesh;
+        var br = brainGO.AddComponent<MeshRenderer>(); br.sharedMaterial = brainMaterial;
+
+        // Tumor
+        GameObject tumorGO = new GameObject("Tumor");
+        tumorGO.transform.SetParent(root.transform, false);
+        var tf = tumorGO.AddComponent<MeshFilter>(); tf.sharedMesh = tumorMesh;
+        var tr = tumorGO.AddComponent<MeshRenderer>(); tr.sharedMaterial = tumorMaterial;
+
+        // Guardar como prefab
+        string dir = Path.GetDirectoryName(combinedPrefabPath);
+        if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+
+        PrefabUtility.SaveAsPrefabAsset(root, combinedPrefabPath, out bool success);
+        if (success)
+            Debug.Log($"✅ Prefab combinado guardado en: {combinedPrefabPath}");
+        else
+            Debug.LogError($"❌ Error al guardar prefab en: {combinedPrefabPath}");
+
+        // Limpia el root temporal de la escena
+        Object.DestroyImmediate(root);
+    }
+#endif
 }
 
 
