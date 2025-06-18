@@ -132,15 +132,49 @@ public class MedicalMeshLoader : MonoBehaviour
 
         // Crea y configura el GameObject
         var go = new GameObject(goName);
-        var mf = go.AddComponent<MeshFilter>();   mf.mesh     = mesh;
-        var mr = go.AddComponent<MeshRenderer>(); mr.material = mat;
+        var mf = go.AddComponent<MeshFilter>();   mf.mesh = mesh;
+        var mr = go.AddComponent<MeshRenderer>();
+
+        // Instancia el material para modificar color/alpha
+        var matInstance = mat != null ? new Material(mat) : new Material(Shader.Find("Standard"));
+        mr.material = matInstance;
+
+        // Ajusta color según tipo de modelo
+        if (goName == "BrainModel")
+        {
+            Color c = matInstance.color;
+            c.a = 0.4f;                     // semitransparente
+            matInstance.color = c;
+            matInstance.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+            matInstance.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+            matInstance.SetInt("_ZWrite", 0);
+            matInstance.DisableKeyword("_ALPHATEST_ON");
+            matInstance.EnableKeyword("_ALPHABLEND_ON");
+            matInstance.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+        }
+        else if (goName == "TumorModel")
+        {
+            matInstance.color = Color.red;  // color distintivo
+        }
 
         // Mismos transform para superponer
         go.transform.position   = Vector3.zero;
         go.transform.rotation   = Quaternion.Euler(-90, 0, 0);
         go.transform.localScale = Vector3.one;
 
+        TryMergeModels();
+
         Debug.Log($"✅ {goName} cargado y añadido a la escena.");
+    }
+
+    void TryMergeModels()
+    {
+        var brain = GameObject.Find("BrainModel");
+        var tumor = GameObject.Find("TumorModel");
+        if (brain != null && tumor != null && tumor.transform.parent != brain.transform)
+        {
+            tumor.transform.SetParent(brain.transform, true);
+        }
     }
 }
 
