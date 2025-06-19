@@ -34,6 +34,78 @@ public class MedicalMeshLoader : MonoBehaviour
     }
 #endif
 
+    // Pop-up visible en build (Android)
+    GameObject runtimePopup;
+    IEnumerator HideRuntimePopup()
+    {
+        yield return new WaitForSeconds(2f);
+        if (runtimePopup != null) runtimePopup.SetActive(false);
+    }
+
+    void ShowRuntimePopup(string message)
+    {
+#if UNITY_ANDROID && !UNITY_EDITOR
+        // Intenta mostrar toast nativo en Android
+        try
+        {
+            using (var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+            using (var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
+            using (var toastClass = new AndroidJavaClass("android.widget.Toast"))
+            {
+                activity.Call("runOnUiThread", new AndroidJavaRunnable(() =>
+                {
+                    AndroidJavaObject toast = toastClass.CallStatic<AndroidJavaObject>("makeText", activity, message, toastClass.GetStatic<int>("LENGTH_SHORT"));
+                    toast.Call("show");
+                }));
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.Log("Toast failed: " + e.Message);
+        }
+#else
+        // Fallback usando Canvas
+        Canvas canvas = FindObjectOfType<Canvas>();
+        if (canvas == null)
+        {
+            Debug.Log(message);
+            return;
+        }
+
+        if (runtimePopup == null)
+        {
+            runtimePopup = new GameObject("RuntimePopup", typeof(RectTransform), typeof(CanvasRenderer), typeof(UnityEngine.UI.Image));
+            runtimePopup.transform.SetParent(canvas.transform, false);
+            var rect = runtimePopup.GetComponent<RectTransform>();
+            rect.anchorMin = new Vector2(0.2f, 0.4f);
+            rect.anchorMax = new Vector2(0.8f, 0.6f);
+
+            var img = runtimePopup.GetComponent<UnityEngine.UI.Image>();
+            img.color = new Color(0f, 0f, 0f, 0.8f);
+
+            GameObject textObj = new GameObject("Message", typeof(RectTransform));
+            textObj.transform.SetParent(runtimePopup.transform, false);
+            var textRect = textObj.GetComponent<RectTransform>();
+            textRect.anchorMin = new Vector2(0, 0);
+            textRect.anchorMax = new Vector2(1, 1);
+            textRect.offsetMin = Vector2.zero;
+            textRect.offsetMax = Vector2.zero;
+
+            TMP_Text tmp = textObj.AddComponent<TMP_Text>();
+            tmp.alignment = TextAlignmentOptions.Center;
+            tmp.fontSize = 32;
+            tmp.color = Color.white;
+            TMP_Text refFont = FindObjectOfType<TMP_Text>();
+            if (refFont != null && refFont.font != null) tmp.font = refFont.font;
+        }
+
+        var popupText = runtimePopup.GetComponentInChildren<TMP_Text>();
+        if (popupText != null) popupText.text = message;
+        runtimePopup.SetActive(true);
+        StartCoroutine(HideRuntimePopup());
+#endif
+    }
+
     public void LoadBrainFile(string inputPath)
     {
         StartCoroutine(ConvertAndImport(inputPath, brainObjPath, ModelType.Brain));
@@ -70,6 +142,9 @@ private IEnumerator ConvertAndImport(string inputFullPath, string objAssetPath, 
 
         File.WriteAllBytes(objAssetPath, www.downloadHandler.data);
         Debug.Log($"✅ OBJ recibido y guardado en: {objAssetPath}");
+        ShowRuntimePopup(type == ModelType.Brain ?
+            "NIFTI de Cerebro cargado correctamente." :
+            "NIFTI del Tumor cargado correctamente.");
     }
 
 #if UNITY_EDITOR
@@ -128,11 +203,13 @@ private IEnumerator ConvertAndImport(string inputFullPath, string objAssetPath, 
         {
             Debug.Log($"✅ Prefab combinado guardado en: {combinedPrefabPath}");
             ShowEditorPopup($"Prefab combinado guardado en: {combinedPrefabPath}");
+            ShowRuntimePopup("Prefab combinado guardado correctamente.");
         }
         else
         {
             Debug.LogError($"❌ Error al guardar prefab en: {combinedPrefabPath}");
             ShowEditorPopup($"Error al guardar prefab en: {combinedPrefabPath}");
+            ShowRuntimePopup("Error al guardar el prefab.");
         }
 
         // Limpia el root temporal de la escena
