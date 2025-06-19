@@ -1,4 +1,5 @@
 using UnityEngine;
+using TMPro;
 using System.IO;
 using System.Collections;
 #if UNITY_EDITOR
@@ -24,6 +25,13 @@ public class MedicalMeshLoader : MonoBehaviour
 
     private Mesh brainMesh;
     private Mesh tumorMesh;
+
+#if UNITY_EDITOR
+    private void ShowEditorPopup(string message)
+    {
+        EditorUtility.DisplayDialog("Neurosight", message, "OK");
+    }
+#endif
 
     public void LoadBrainFile(string inputPath)
     {
@@ -66,6 +74,11 @@ public class MedicalMeshLoader : MonoBehaviour
         brainMesh  = (type == ModelType.Brain) ? LoadMesh(objAssetPath) : brainMesh;
         tumorMesh  = (type == ModelType.Tumor) ? LoadMesh(objAssetPath) : tumorMesh;
 
+        if (type == ModelType.Brain && brainMesh != null)
+            ShowEditorPopup("NIFTI de Cerebro cargado correctamente.");
+        else if (type == ModelType.Tumor && tumorMesh != null)
+            ShowEditorPopup("NIFTI del Tumor cargado correctamente.");
+
         if (brainMesh != null && tumorMesh != null)
         {
             CreateCombinedPrefab();
@@ -105,9 +118,15 @@ public class MedicalMeshLoader : MonoBehaviour
 
         PrefabUtility.SaveAsPrefabAsset(root, combinedPrefabPath, out bool success);
         if (success)
+        {
             Debug.Log($"✅ Prefab combinado guardado en: {combinedPrefabPath}");
+            ShowEditorPopup($"Prefab combinado guardado en: {combinedPrefabPath}");
+        }
         else
+        {
             Debug.LogError($"❌ Error al guardar prefab en: {combinedPrefabPath}");
+            ShowEditorPopup($"Error al guardar prefab en: {combinedPrefabPath}");
+        }
 
         // Limpia el root temporal de la escena
         Object.DestroyImmediate(root);
