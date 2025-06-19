@@ -45,31 +45,37 @@ public class MedicalMeshLoader : MonoBehaviour
 
     private enum ModelType { Brain, Tumor }
 
-    private IEnumerator ConvertAndImport(string inputFullPath, string objAssetPath, ModelType type)
+private IEnumerator ConvertAndImport(string inputFullPath, string objAssetPath, ModelType type)
+{
+    string apiUrl = "https://converapi.onrender.com/convert/";
+
+    // Leer el archivo .nii
+    byte[] fileBytes = File.ReadAllBytes(inputFullPath);
+    WWWForm form = new WWWForm();
+    form.AddBinaryData("file", fileBytes, Path.GetFileName(inputFullPath), "application/octet-stream");
+    form.AddField("tipo", "nifti"); // o "dicom"
+    form.AddField("threshold", "1.0");
+
+    using (UnityWebRequest www = UnityWebRequest.Post(apiUrl, form))
     {
-        string exeFull = Path.GetFullPath(converterExePath).Replace("\\", "/");
-        string inFull  = Path.GetFullPath(inputFullPath).Replace("\\", "/");
-        string outFull = Path.GetFullPath(objAssetPath).Replace("\\", "/");
-        string args    = $"\"{inFull}\" \"{outFull}\" nifti";
+        www.downloadHandler = new DownloadHandlerBuffer(); // 👈 agrega esto
+        yield return www.SendWebRequest();
 
-        if (!File.Exists(exeFull) || !File.Exists(inFull)) yield break;
-
-        var psi = new System.Diagnostics.ProcessStartInfo
+        if (www.result != UnityWebRequest.Result.Success)
         {
-            FileName = exeFull,
-            Arguments = args,
-            UseShellExecute = false,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            CreateNoWindow = true
-        };
-        var proc = System.Diagnostics.Process.Start(psi);
-        proc.WaitForExit();
+            Debug.LogError("❌ Error al llamar a la API: " + www.error);
+            yield break;
+        }
+
+        File.WriteAllBytes(objAssetPath, www.downloadHandler.data);
+        Debug.Log($"✅ OBJ recibido y guardado en: {objAssetPath}");
+    }
 
 #if UNITY_EDITOR
-        AssetDatabase.Refresh();
-        AssetDatabase.ImportAsset(objAssetPath);
-        yield return null;
+    // Recargar el archivo como asset
+    AssetDatabase.Refresh();
+    AssetDatabase.ImportAsset(objAssetPath);
+    yield return null;
 
         brainMesh  = (type == ModelType.Brain) ? LoadMesh(objAssetPath) : brainMesh;
         tumorMesh  = (type == ModelType.Tumor) ? LoadMesh(objAssetPath) : tumorMesh;
@@ -84,7 +90,7 @@ public class MedicalMeshLoader : MonoBehaviour
             CreateCombinedPrefab();
         }
 #endif
-    }
+}
 
 #if UNITY_EDITOR
     private Mesh LoadMesh(string path)
