@@ -104,10 +104,19 @@ public class MedicalMeshLoader : MonoBehaviour
         if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
 
         PrefabUtility.SaveAsPrefabAsset(root, combinedPrefabPath, out bool success);
+        var checker = FindObjectOfType<ARCoreSupportChecker>();
         if (success)
+        {
             Debug.Log($"✅ Prefab combinado guardado en: {combinedPrefabPath}");
+            if (checker != null)
+                checker.ShowPopup("Cerebro y tumor cargados correctamente");
+        }
         else
+        {
             Debug.LogError($"❌ Error al guardar prefab en: {combinedPrefabPath}");
+            if (checker != null)
+                checker.ShowPopup("Error al guardar prefab");
+        }
 
         // Limpia el root temporal de la escena
         Object.DestroyImmediate(root);
